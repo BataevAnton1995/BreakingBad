@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.breakingbad.data.managers.network.api.RegAccount;
+import com.breakingbad.data.managers.network.api.Registration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,18 +19,19 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
+
 public class MainActivity extends AppCompatActivity {
     private final String URL="http://91.225.109.172:7070";
 
     private EditText mMail;
     private EditText mPass;
     private Button mReg;
-    private Gson regData = new GsonBuilder().create();
-    private Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create(regData))
+    private Gson gson = new GsonBuilder().create();
+    private Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create(gson))
             .baseUrl(URL)
             .build();
 
-    private RegAccount intf = retrofit.create(RegAccount.class);
+    private Registration intf = retrofit.create(Registration.class);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,18 +44,19 @@ public class MainActivity extends AppCompatActivity {
         mReg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map<String,String> mapJson = new HashMap<String, String>();
-                String status = null;
-                mapJson.put("password","qweqweqwe");
-                mapJson.put("socialIdentifier","native");
-                mapJson.put("email","25655qwe@mail.ru");
+                Map<String, String> mapJson = new HashMap<String, String>();
+                mapJson.put("password", "qweqweqwe");
+                mapJson.put("socialIdentifier", "native");
+                mapJson.put("email", "25655qwe@mail.ru");
 
-                Call<Object> call = intf.data(status, mapJson);
+                String status = null;
+                Call<Object> call = intf.regData(status, mapJson);
+                System.out.println(intf.toString()+"<-Gson");
                 try {
                     Response<Object> response = call.execute();
-                    Map <String,String> map = regData.fromJson(response.body().toString(), Map.class);
-                    for(Map.Entry e:map.entrySet()){
-                        System.out.println(e.getKey()+" "+e.getValue());
+                    Map<String, String> map = gson.fromJson(response.body().toString(), Map.class);
+                    for (Map.Entry e : map.entrySet()) {
+                        System.out.println(e.getKey() + " " + e.getValue());
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
